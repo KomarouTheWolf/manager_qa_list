@@ -9,12 +9,12 @@
     :root { 
       --primary: #008ba3; 
       --secondary: #00acc1;
-      --bg: #f3ece0; /* 米褐色背景 */
+      --bg: #f3ece0; /* 更深一點的米褐色 */
       --accent: #cfb53b;
       --text: #2c3e50;
       --gray: #78909c;
       
-      /* 低飽和度與低對比卡片背景 */
+      /* 調整卡片背景色，降低飽和度與對比 */
       --diff-bg-基礎: #e6f2f3; 
       --diff-bg-低: #e8f0f5; 
       --diff-bg-中: #f5f0e8; 
@@ -74,19 +74,46 @@
       text-align: center;
     }
 
-    /* 篩選與排序面板 */
+    /* 篩選切換按鈕 */
+    .toggle-controls-btn {
+      background: white;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 15px;
+      transition: 0.3s;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toggle-controls-btn:hover { background: var(--primary); color: white; }
+
+    /* 篩選與排序面板：改為可隱藏 */
     .controls-panel {
       width: 100%;
       max-width: 1200px;
       background: rgba(255, 255, 255, 0.5);
       border-radius: 15px;
-      padding: 15px;
+      padding: 0;
       margin-bottom: 25px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       gap: 15px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
     }
+    .controls-panel.open {
+      max-height: 300px;
+      padding: 20px;
+      border: 1px solid rgba(0, 139, 163, 0.1);
+    }
+
     .control-group {
       display: flex;
       flex-wrap: wrap;
@@ -105,10 +132,7 @@
       font-size: 0.85em;
       transition: 0.2s;
     }
-    .filter-btn.active {
-      background: var(--primary);
-      color: white;
-    }
+    .filter-btn.active { background: var(--primary); color: white; }
 
     /* 網格容器 */
     .quiz-grid {
@@ -121,7 +145,7 @@
       box-sizing: border-box;
     }
 
-    /* 小卡片樣式 */
+    /* 小卡片樣式：移除按鈕，簡化介面 */
     .mini-card {
       background: white;
       border-radius: 15px;
@@ -133,13 +157,10 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      height: 180px;
+      height: 160px; /* 稍微縮短高度 */
       box-sizing: border-box;
     }
-    .mini-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 15px rgba(0, 139, 163, 0.08);
-    }
+    .mini-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 139, 163, 0.08); }
     .mini-card .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .mini-card .diff-tag { font-size: 0.75em; font-weight: bold; }
     .mini-card .q-preview {
@@ -147,20 +168,6 @@
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
       flex-grow: 1;
     }
-    
-    /* 卡片內的小導向按鈕 */
-    .mini-submit-btn {
-      align-self: flex-end;
-      padding: 4px 10px;
-      font-size: 0.75em;
-      background: rgba(0, 139, 163, 0.1);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .mini-submit-btn:hover { background: var(--primary); color: white; }
 
     /* 展開模式（Modal） */
     .modal-overlay {
@@ -186,9 +193,16 @@
       position: relative;
       animation: expandIn 0.3s ease-out;
       max-height: 90vh;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
       box-sizing: border-box;
     }
+    .modal-scroll-content {
+      overflow-y: auto;
+      flex-grow: 1;
+      padding-right: 5px;
+    }
+
     @keyframes expandIn {
       from { transform: scale(0.95); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
@@ -218,20 +232,23 @@
     .situation-inline { font-size: 0.85em; color: var(--gray); margin-bottom: 6px; font-weight: bold; }
     .question-content { font-size: 1.15em; line-height: 1.5; font-weight: bold; }
 
+    /* 修改後的小型化建議按鈕 */
     .submit-ans-btn {
-      width: 100%;
-      margin-top: 10px;
-      padding: 12px;
+      width: auto;
+      align-self: center;
+      margin-top: 15px;
+      padding: 8px 20px;
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 15px;
+      border-radius: 20px;
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
-      font-size: 0.95em;
+      font-size: 0.85em; /* 縮小按鈕 */
+      box-shadow: 0 2px 8px rgba(0,139,163,0.15);
     }
-    .submit-ans-btn:hover { background: var(--secondary); transform: translateY(-2px); }
+    .submit-ans-btn:hover { background: var(--secondary); transform: scale(1.05); }
 
     .answers-container {
       margin-top: 20px;
@@ -239,7 +256,7 @@
       border-top: 2px dashed rgba(0,0,0,0.05);
     }
     .answer-item {
-      background: #f8fcfd; padding: 12px 15px; border-radius: 12px; margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.5); padding: 12px 15px; border-radius: 12px; margin-bottom: 12px;
       border-left: 4px solid var(--accent); font-size: 0.9em;
     }
     .answer-text { white-space: pre-line; color: #37474f; font-weight: 500; }
@@ -268,7 +285,6 @@
     .spinner-img { 
       width: 80px; height: 80px; object-fit: cover; border-radius: 50%;
       animation: spin 2s linear infinite; margin-bottom: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -283,22 +299,30 @@
     <div style="font-weight: bold; color: var(--primary)">布偶正在整理題目...</div>
   </div>
 
+  <!-- 展開對話框 -->
   <div id="modal" class="modal-overlay" onclick="closeCard(event)">
     <div class="expanded-card" onclick="event.stopPropagation()">
       <div class="close-btn" onclick="closeCard()">✕</div>
-      <div id="exp-diff" class="difficulty-tag" style="text-align:right; font-weight:800; font-size:0.85em; margin-bottom:15px;"></div>
       
-      <div class="chat-area">
-        <div class="person-icon">👤</div>
-        <div class="speech-bubble">
-          <div id="exp-sit" class="situation-inline"></div>
-          <div id="exp-q" class="question-content"></div>
+      <!-- 難度顯示改到左邊 -->
+      <div id="exp-diff" class="difficulty-tag" style="text-align:left; font-weight:800; font-size:0.85em; margin-bottom:5px;"></div>
+      
+      <div class="modal-scroll-content">
+        <div class="chat-area">
+          <div class="person-icon">👤</div>
+          <div class="speech-bubble">
+            <div id="exp-sit" class="situation-inline"></div>
+            <div id="exp-q" class="question-content"></div>
+          </div>
+        </div>
+        
+        <div id="exp-answers" class="answers-container"></div>
+        
+        <!-- 提供建議按鈕移至最下方 -->
+        <div style="text-align: center; margin-bottom: 10px;">
+          <button class="submit-ans-btn" onclick="goToSubmitSpecific()">我也要提供建議！🐾</button>
         </div>
       </div>
-      
-      <button class="submit-ans-btn" onclick="goToSubmitSpecific()">我也要提供建議！🐾</button>
-      
-      <div id="exp-answers" class="answers-container"></div>
     </div>
   </div>
 
@@ -311,8 +335,13 @@
     </div>
   </div>
 
+  <!-- 篩選切換按鈕 -->
+  <button class="toggle-controls-btn" onclick="toggleControls()">
+    ⚙️ 篩選與排序選項 <span id="toggle-icon">▼</span>
+  </button>
+
   <!-- 篩選與排序面板 -->
-  <div class="controls-panel">
+  <div id="controls-panel" class="controls-panel">
     <div class="control-group">
       <div class="control-label">難度篩選</div>
       <button class="filter-btn active" onclick="toggleFilter('基礎', this)">基礎</button>
@@ -322,9 +351,9 @@
     </div>
     <div class="control-group">
       <div class="control-label">題目排序</div>
-      <button id="sort-random" class="filter-btn active" onclick="setSort('random')">無序</button>
-      <button id="sort-asc" class="filter-btn" onclick="setSort('asc')">難度升序</button>
-      <button id="sort-desc" class="filter-btn" onclick="setSort('desc')">難度應降序</button>
+      <button id="sort-random" class="filter-btn active" onclick="setSort('random')">隨機</button>
+      <button id="sort-asc" class="filter-btn" onclick="setSort('asc')">升序</button>
+      <button id="sort-desc" class="filter-btn" onclick="setSort('desc')">降序</button>
     </div>
   </div>
 
@@ -342,9 +371,10 @@
   </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
+  const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
+  const API_URL = SUBMIT_URL; 
   
-  let rawQuestions = []; // 原始資料
+  let rawQuestions = []; 
   let currentFilters = ['基礎', '低', '中', '高'];
   let currentSort = 'random';
   let currentSelectedQuestionId = null;
@@ -365,12 +395,16 @@
     }
   }
 
-  // 篩選與排序邏輯
-  function applyAndRender() {
-    // 1. 篩選
-    let displayList = rawQuestions.filter(q => currentFilters.includes(q.difficulty || '基礎'));
+  // 切換控制面板
+  function toggleControls() {
+    const panel = document.getElementById('controls-panel');
+    const icon = document.getElementById('toggle-icon');
+    const isOpen = panel.classList.toggle('open');
+    icon.innerText = isOpen ? '▲' : '▼';
+  }
 
-    // 2. 排序
+  function applyAndRender() {
+    let displayList = rawQuestions.filter(q => currentFilters.includes(q.difficulty || '基礎'));
     if (currentSort === 'random') {
       displayList.sort(() => Math.random() - 0.5);
     } else if (currentSort === 'asc') {
@@ -378,7 +412,6 @@
     } else if (currentSort === 'desc') {
       displayList.sort((a, b) => (diffWeight[b.difficulty] || 1) - (diffWeight[a.difficulty] || 1));
     }
-
     renderGrid(displayList);
   }
 
@@ -391,14 +424,11 @@
       const card = document.createElement('div');
       card.className = 'mini-card';
       card.style.backgroundColor = `var(--diff-bg-${diff})`;
-      
-      // 點擊卡片本體展開
       card.onclick = () => openCardByData(q);
 
       card.innerHTML = `
         <div class="card-top">
           <div class="diff-tag" style="color:var(--diff-text-${diff})">難度：${diff}</div>
-          <div class="mini-submit-btn" onclick="event.stopPropagation(); goToSpecificId('${q.id}')">✎ 提供答案</div>
         </div>
         <div class="q-preview" style="color:var(--diff-text-${diff})">「${q.content}」</div>
       `;
@@ -408,7 +438,7 @@
 
   function toggleFilter(diff, btn) {
     if (currentFilters.includes(diff)) {
-      if (currentFilters.length === 1) return; // 至少留一個
+      if (currentFilters.length === 1) return;
       currentFilters = currentFilters.filter(d => d !== diff);
       btn.classList.remove('active');
     } else {
@@ -461,9 +491,8 @@
   }
 
   function goToSpecificId(id) {
-    google.script.run.withSuccessHandler(function(url) {
-      window.top.location.href = url + "?q_id=" + id;
-    }).getScriptUrl();
+    const targetUrl = SUBMIT_URL + "?q_id=" + id;
+    window.top.location.href = targetUrl;
   }
 
   function goToSubmitSpecific() {
@@ -471,9 +500,7 @@
   }
 
   function goToSubmitGeneral() {
-    google.script.run.withSuccessHandler(function(url) {
-      window.top.location.href = url;
-    }).getScriptUrl();
+    window.top.location.href = SUBMIT_URL;
   }
 
   window.onload = init;
