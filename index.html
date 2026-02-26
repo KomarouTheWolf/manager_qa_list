@@ -9,12 +9,12 @@
     :root { 
       --primary: #008ba3; 
       --secondary: #00acc1;
-      --bg: #f3ece0; /* 更深一點的米褐色 */
+      --bg: #f3ece0; /* 米褐色背景 */
       --accent: #cfb53b;
       --text: #2c3e50;
       --gray: #78909c;
       
-      /* 調整卡片背景色，降低飽和度與對比 */
+      /* 低飽和度與低對比卡片背景 */
       --diff-bg-基礎: #e6f2f3; 
       --diff-bg-低: #e8f0f5; 
       --diff-bg-中: #f5f0e8; 
@@ -40,8 +40,17 @@
       overflow-x: hidden;
     }
     
-    /* 標題區域強化 */
-    .header-section { text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; }
+    /* 標題區域強化：確保電腦版橫向置中對齊 */
+    .header-section { 
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* 強制子元素橫向置中 */
+      text-align: center; 
+      margin-bottom: 25px; 
+      width: 100%; 
+      box-sizing: border-box; 
+    }
+    
     h1 { 
       display: inline-block;
       background: var(--primary); 
@@ -67,10 +76,10 @@
       font-weight: bold; 
       line-height: 1.6;
       background: rgba(255, 255, 255, 0.6);
-      padding: 12px 20px;
+      padding: 12px 25px;
       border-radius: 12px;
       display: inline-block;
-      max-width: 90%;
+      max-width: 85%; /* 稍微收小一點寬度讓視覺更集中 */
       text-align: center;
     }
 
@@ -79,7 +88,7 @@
       background: white;
       color: var(--primary);
       border: 1.5px solid var(--primary);
-      padding: 8px 20px;
+      padding: 8px 25px;
       border-radius: 20px;
       font-weight: bold;
       cursor: pointer;
@@ -92,7 +101,7 @@
     }
     .toggle-controls-btn:hover { background: var(--primary); color: white; }
 
-    /* 篩選與排序面板：改為可隱藏 */
+    /* 篩選與排序面板 */
     .controls-panel {
       width: 100%;
       max-width: 1200px;
@@ -118,6 +127,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
+      justify-content: center; /* 控制項也預設置中 */
       gap: 10px;
     }
     .control-label { font-weight: bold; color: var(--primary); font-size: 0.9em; min-width: 70px; }
@@ -145,7 +155,7 @@
       box-sizing: border-box;
     }
 
-    /* 小卡片樣式：移除按鈕，簡化介面 */
+    /* 小卡片樣式 */
     .mini-card {
       background: white;
       border-radius: 15px;
@@ -157,7 +167,7 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      height: 160px; /* 稍微縮短高度 */
+      height: 160px;
       box-sizing: border-box;
     }
     .mini-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 139, 163, 0.08); }
@@ -232,12 +242,11 @@
     .situation-inline { font-size: 0.85em; color: var(--gray); margin-bottom: 6px; font-weight: bold; }
     .question-content { font-size: 1.15em; line-height: 1.5; font-weight: bold; }
 
-    /* 修改後的小型化建議按鈕 */
     .submit-ans-btn {
       width: auto;
       align-self: center;
       margin-top: 15px;
-      padding: 8px 20px;
+      padding: 8px 25px;
       background: var(--primary);
       color: white;
       border: none;
@@ -245,7 +254,7 @@
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
-      font-size: 0.85em; /* 縮小按鈕 */
+      font-size: 0.85em;
       box-shadow: 0 2px 8px rgba(0,139,163,0.15);
     }
     .submit-ans-btn:hover { background: var(--secondary); transform: scale(1.05); }
@@ -304,7 +313,7 @@
     <div class="expanded-card" onclick="event.stopPropagation()">
       <div class="close-btn" onclick="closeCard()">✕</div>
       
-      <!-- 難度顯示改到左邊 -->
+      <!-- 難度顯示 -->
       <div id="exp-diff" class="difficulty-tag" style="text-align:left; font-weight:800; font-size:0.85em; margin-bottom:5px;"></div>
       
       <div class="modal-scroll-content">
@@ -318,7 +327,6 @@
         
         <div id="exp-answers" class="answers-container"></div>
         
-        <!-- 提供建議按鈕移至最下方 -->
         <div style="text-align: center; margin-bottom: 10px;">
           <button class="submit-ans-btn" onclick="goToSubmitSpecific()">我也要提供建議！🐾</button>
         </div>
@@ -371,6 +379,9 @@
   </div>
 
 <script>
+  // ==========================================
+  // 在這裡設定您的 Google Script Web App 網址
+  // ==========================================
   const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
   const API_URL = SUBMIT_URL; 
   
