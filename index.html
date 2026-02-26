@@ -9,7 +9,7 @@
     :root { 
       --primary: #008ba3; 
       --secondary: #00acc1;
-      --bg: #fffaf0; /* 修改為角色的米白膚色 */
+      --bg: #fffaf0; 
       --accent: #cfb53b;
       --text: #2c3e50;
       --gray: #78909c;
@@ -39,7 +39,6 @@
       min-height: 100vh;
     }
     
-    /* 標題區域強化 */
     .header-section { text-align: center; margin-bottom: 25px; width: 100%; max-width: 500px; }
     h1 { 
       display: inline-block;
@@ -62,7 +61,6 @@
       border-radius: 10px;
     }
 
-    /* 進度指示器 */
     .progress-bar {
       width: 100%;
       max-width: 500px;
@@ -79,7 +77,6 @@
       transition: width 0.3s;
     }
 
-    /* 練習圖卡容器 */
     .card-container {
       width: 100%;
       max-width: 500px;
@@ -100,7 +97,6 @@
       transition: background-color 0.4s ease, transform 0.3s ease;
     }
 
-    /* 難度標籤 */
     .difficulty-tag {
       text-align: right;
       font-size: 0.85em;
@@ -110,7 +106,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* 對話區域佈局 */
     .chat-area { 
       display: flex; 
       align-items: flex-start; 
@@ -134,17 +129,15 @@
       border-color: transparent rgba(255, 255, 255, 0.7) transparent transparent; 
     }
 
-    /* 情境文字：改為粗體 */
     .situation-inline { 
       font-size: 0.9em; 
       color: var(--gray); 
       margin-bottom: 8px; 
       line-height: 1.4; 
-      font-weight: bold; /* 修改為粗體 */
+      font-weight: bold;
     }
     .question-content { font-size: 1.25em; line-height: 1.6; font-weight: bold; color: inherit; }
 
-    /* 控制按鈕 */
     .nav-controls {
       display: flex;
       justify-content: space-between;
@@ -176,7 +169,6 @@
     }
     .toggle-ans-btn:hover { background: var(--bg); }
 
-    /* 回答區塊 */
     .answers-container {
       display: none;
       margin-top: 20px;
@@ -198,7 +190,6 @@
     .answer-text { white-space: pre-line; color: #37474f; font-weight: 500; }
     .nickname { font-size: 0.85em; color: var(--gray); margin-left: 8px; }
 
-    /* 下方導覽 */
     .nav-section {
       text-align: center;
       width: 100%;
@@ -216,10 +207,11 @@
       font-weight: bold;
       margin-top: 10px;
       display: inline-block;
-      padding: 5px 15px;
-      border: 1px solid var(--primary);
+      padding: 8px 20px;
+      border: 1.5px solid var(--primary);
       border-radius: 20px;
       transition: 0.3s;
+      cursor: pointer;
     }
     .link-btn:hover { background: var(--primary); color: white; }
 
@@ -240,10 +232,9 @@
 </head>
 <body>
 
-  <!-- 讀取遮罩 -->
   <div id="loader" class="loading-overlay">
     <div class="spinner"></div>
-    <div style="font-weight: bold; color: var(--primary)">馬內正在搬運圖卡...</div>
+    <div style="font-weight: bold; color: var(--primary)">布偶正在搬運圖卡...</div>
   </div>
 
   <div class="header-section">
@@ -282,7 +273,7 @@
 
   <div class="nav-section">
     遇到了其他沒在上面的問題，或者想提供你的回答方法？<br>
-    <a href="javascript:void(0)" class="link-btn" onclick="goToSubmit()">📝 前往提交介面</a>
+    <a class="link-btn" onclick="goToSubmit()">📝 前往提交介面</a>
   </div>
 
   <div class="footer">
@@ -290,30 +281,28 @@
   </div>
 
 <script>
-  // 重要：請替換成你部署後的 GAS Web App 網址
+  // 部署後的 GAS Web App 網址
   const API_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
   
   let allQuestions = [];
   let currentIndex = 0;
 
-  // 1. 初始化讀取
   async function init() {
     try {
       const response = await fetch(`${API_URL}?action=getQA`);
+      if (!response.ok) throw new Error('網路回應不正確');
       const data = await response.json();
       
-      // 隨機排序
       allQuestions = data.sort(() => Math.random() - 0.5);
       
       document.getElementById('loader').style.display = 'none';
       renderCard();
     } catch (error) {
       console.error(error);
-      alert("讀取資料失敗。請檢查 API 網址並重新整理。");
+      document.getElementById('loader').innerHTML = "<div style='color:red;padding:20px;text-align:center;'>載入資料失敗。<br>請確認 GAS 已「部署為 Web App」並將權限設為「任何人(Anyone)」。</div>";
     }
   }
 
-  // 2. 渲染當前題目
   function renderCard() {
     if (allQuestions.length === 0) return;
 
@@ -325,36 +314,29 @@
     const list = document.getElementById('answers-list');
     const toggleBtn = document.getElementById('toggle-ans-btn');
 
-    // 更新內容
     sitText.innerText = q.situation ? q.situation : "";
     sitText.style.display = q.situation ? "block" : "none";
     qContent.innerText = `「${q.content}」`;
     
-    // 更新難度與背景顏色
     const diff = q.difficulty || "基礎";
     qDiff.innerText = "難度：" + diff;
     card.style.backgroundColor = `var(--diff-bg-${diff})`;
     card.style.color = `var(--diff-text-${diff})`;
     
-    // 重置回答區域
     list.classList.remove('active');
     list.innerHTML = "";
     toggleBtn.innerText = "看看其他人的回答方法！";
     toggleBtn.style.display = q.answers.length > 0 ? "block" : "none";
 
-    // 更新按鈕狀態
     document.getElementById('prev-btn').disabled = (currentIndex === 0);
     document.getElementById('next-btn').innerText = (currentIndex === allQuestions.length - 1) ? "全部完成！" : "下一題 →";
 
-    // 更新進度條
     const progress = ((currentIndex + 1) / allQuestions.length) * 100;
     document.getElementById('progress-fill').style.width = progress + "%";
   }
 
-  // 3. 切換題目
   function changeQuestion(step) {
     const newIndex = currentIndex + step;
-    
     if (newIndex >= 0 && newIndex < allQuestions.length) {
       currentIndex = newIndex;
       renderCard();
@@ -365,7 +347,6 @@
     }
   }
 
-  // 4. 切換回答顯示
   function toggleAnswers() {
     const list = document.getElementById('answers-list');
     const btn = document.getElementById('toggle-ans-btn');
@@ -385,18 +366,15 @@
     }
   }
 
-  // 5. 鍵盤支援
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') changeQuestion(-1);
     if (e.key === 'ArrowRight') changeQuestion(1);
   });
 
-  // 6. 跳轉提交
+  // 修正跳轉功能：直接跳轉，不再依賴 google.script.run
   function goToSubmit() {
-    // 此處 logic 可根據您的部署方式微調網址
-    google.script.run.withSuccessHandler(function(url) {
-      window.top.location.href = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
-    }).getScriptUrl();
+    const targetUrl = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
+    window.open(targetUrl, '_top');
   }
 
   window.onload = init;
