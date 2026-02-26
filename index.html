@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>馬內用考古題練習器</title>
+  <title>馬內生存模擬器</title>
   <style>
     /* 配色採用角色方案：青藍 (#008ba3)、米白膚色 (#fffaf0)、金黃 (#cfb53b) */
     :root { 
@@ -39,17 +39,19 @@
       min-height: 100vh;
     }
     
+    /* 標題區域強化：調整色塊長度 */
     .header-section { text-align: center; margin-bottom: 25px; width: 100%; max-width: 500px; }
     h1 { 
       display: inline-block;
       background: var(--primary); 
       color: white; 
-      padding: 12px 25px; 
+      padding: 12px 60px; /* 增加左右內邊距使色塊更長 */
       border-radius: 15px; 
       box-shadow: 0 4px 15px rgba(0, 139, 163, 0.2);
       margin-bottom: 15px; 
-      letter-spacing: 2px; 
+      letter-spacing: 3px; 
       font-size: 1.6em; 
+      white-space: nowrap;
     }
     .subtitle { 
       color: var(--primary); 
@@ -215,15 +217,20 @@
     }
     .link-btn:hover { background: var(--primary); color: white; }
 
+    /* 修改 Loading 轉圈：使用 1.jpg 並旋轉 */
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg); display: flex; flex-direction: column;
       justify-content: center; align-items: center; z-index: 100;
     }
-    .spinner { 
-      width: 45px; height: 45px; border: 5px solid rgba(0, 139, 163, 0.1); 
-      border-left-color: var(--primary); border-radius: 50%; 
-      animation: spin 1s linear infinite; margin-bottom: 15px;
+    .spinner-img { 
+      width: 80px; /* 圖片大小調整 */
+      height: 80px; 
+      object-fit: cover;
+      border-radius: 50%;
+      animation: spin 2s linear infinite; 
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -232,13 +239,17 @@
 </head>
 <body>
 
+  <!-- 讀取遮罩 -->
   <div id="loader" class="loading-overlay">
-    <div class="spinner"></div>
+    <!-- 使用 GitHub 資料夾中的 1.jpg -->
+    <img src="1.jpg" alt="Loading" class="spinner-img" onerror="this.style.display='none'; document.getElementById('fallback-spinner').style.display='block';">
+    <!-- 備用轉圈 (如果圖片讀取失敗) -->
+    <div id="fallback-spinner" class="spinner" style="display:none; width:45px; height:45px; border:5px solid rgba(0, 139, 163, 0.1); border-left-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
     <div style="font-weight: bold; color: var(--primary)">布偶正在搬運圖卡...</div>
   </div>
 
   <div class="header-section">
-    <h1>馬內用考古題練習器</h1>
+    <h1>馬內生存模擬器</h1>
     <div class="subtitle">
       新手馬內救星！<br>場次前先預習可能會被問什麼奇怪的問題！
     </div>
@@ -299,7 +310,8 @@
       renderCard();
     } catch (error) {
       console.error(error);
-      document.getElementById('loader').innerHTML = "<div style='color:red;padding:20px;text-align:center;'>載入資料失敗。<br>請確認 GAS 已「部署為 Web App」並將權限設為「任何人(Anyone)」。</div>";
+      const loader = document.getElementById('loader');
+      loader.innerHTML = "<div style='color:red;padding:20px;text-align:center;'>載入資料失敗。<br>請確認 GAS 已「部署為 Web App」並將權限設為「任何人(Anyone)」。</div>";
     }
   }
 
@@ -371,9 +383,8 @@
     if (e.key === 'ArrowRight') changeQuestion(1);
   });
 
-  // 修正跳轉功能：直接跳轉，不再依賴 google.script.run
   function goToSubmit() {
-    const targetUrl = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
+    const targetUrl = "https://script.google.com/macros/s/AKfycbzM73d764og_Ke8BTTZQkRWgam-o1oub1vw26TahVzHBtopsiUvfOR3QyXliftKSEvvuw/exec";
     window.open(targetUrl, '_top');
   }
 
