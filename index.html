@@ -5,25 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>馬內生存模擬器</title>
   <style>
-    /* 配色採用角色方案：青藍 (#008ba3)、米白膚色 (#fffaf0)、金黃 (#cfb53b) */
+    /* 配色調整：背景調暗，降低卡片與背景的對比 */
     :root { 
       --primary: #008ba3; 
       --secondary: #00acc1;
-      --bg: #fffaf0; 
+      --bg: #f3ece0; /* 米褐色背景 */
       --accent: #cfb53b;
       --text: #2c3e50;
       --gray: #78909c;
       
-      /* 難度對應顏色 */
-      --diff-bg-基礎: #e0f7fa; 
-      --diff-bg-低: #e3f2fd; 
-      --diff-bg-中: #fff3e0; 
-      --diff-bg-高: #ffebee;
+      /* 低飽和度與低對比卡片背景 */
+      --diff-bg-基礎: #e6f2f3; 
+      --diff-bg-低: #e8f0f5; 
+      --diff-bg-中: #f5f0e8; 
+      --diff-bg-高: #f5ecec;
 
-      --diff-text-基礎: #006064;
-      --diff-text-低: #0d47a1;
-      --diff-text-中: #e65100;
-      --diff-text-高: #b71c1c;
+      --diff-text-基礎: #455a64;
+      --diff-text-低: #455a64;
+      --diff-text-中: #5d4037;
+      --diff-text-高: #c62828;
     }
     
     body { 
@@ -31,42 +31,34 @@
       background: var(--bg); 
       color: var(--text); 
       margin: 0; 
-      padding: 15px; /* 手機版縮小間距 */
+      padding: 15px; 
       display: flex; 
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
       box-sizing: border-box;
-      overflow-x: hidden; /* 防止水平滾動 */
+      overflow-x: hidden;
     }
     
     /* 標題區域強化 */
-    .header-section { text-align: center; margin-bottom: 35px; width: 100%; box-sizing: border-box; }
+    .header-section { text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; }
     h1 { 
       display: inline-block;
       background: var(--primary); 
       color: white; 
-      padding: 12px 80px; 
+      padding: 12px 60px; 
       border-radius: 15px; 
-      box-shadow: 0 4px 15px rgba(0, 139, 163, 0.2);
+      box-shadow: 0 4px 15px rgba(0, 139, 163, 0.1);
       margin-bottom: 15px; 
       letter-spacing: 3px; 
       font-size: 1.8em; 
-      white-space: normal; /* 允許手機版換行 */
-      max-width: 90%; /* 確保標題不超出螢幕 */
+      white-space: normal;
+      max-width: 90%;
       word-wrap: break-word;
     }
 
-    /* 手機版標題優化 */
     @media (max-width: 600px) {
-      h1 {
-        padding: 12px 30px; 
-        font-size: 1.4em;
-        letter-spacing: 1px;
-      }
-      body {
-        padding: 10px;
-      }
+      h1 { padding: 12px 30px; font-size: 1.4em; letter-spacing: 1px; }
     }
 
     .subtitle { 
@@ -79,7 +71,43 @@
       border-radius: 12px;
       display: inline-block;
       max-width: 90%;
+      text-align: center;
+    }
+
+    /* 篩選與排序面板 */
+    .controls-panel {
+      width: 100%;
+      max-width: 1200px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 25px;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .control-label { font-weight: bold; color: var(--primary); font-size: 0.9em; min-width: 70px; }
+    
+    .filter-btn {
+      padding: 6px 15px;
+      border-radius: 20px;
+      border: 1.5px solid var(--primary);
+      background: white;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.85em;
+      transition: 0.2s;
+    }
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
     }
 
     /* 網格容器 */
@@ -93,54 +121,53 @@
       box-sizing: border-box;
     }
 
-    /* 針對超窄螢幕（如 iPhone SE）的調整 */
-    @media (max-width: 320px) {
-      .quiz-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
     /* 小卡片樣式 */
     .mini-card {
       background: white;
       border-radius: 15px;
       padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
       border-top: 5px solid var(--accent);
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative;
       display: flex;
       flex-direction: column;
-      height: 160px;
+      height: 180px;
       box-sizing: border-box;
     }
     .mini-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 20px rgba(0, 139, 163, 0.1);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 139, 163, 0.08);
     }
-    .mini-card .diff-tag {
-      font-size: 0.75em;
-      font-weight: bold;
-      text-align: right;
-      margin-bottom: 8px;
-    }
+    .mini-card .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .mini-card .diff-tag { font-size: 0.75em; font-weight: bold; }
     .mini-card .q-preview {
-      font-size: 1.05em;
-      font-weight: bold;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 1em; font-weight: bold; line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+      flex-grow: 1;
     }
+    
+    /* 卡片內的小導向按鈕 */
+    .mini-submit-btn {
+      align-self: flex-end;
+      padding: 4px 10px;
+      font-size: 0.75em;
+      background: rgba(0, 139, 163, 0.1);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .mini-submit-btn:hover { background: var(--primary); color: white; }
 
     /* 展開模式（Modal） */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(44, 62, 80, 0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(44, 62, 80, 0.6);
+      backdrop-filter: blur(2px);
       display: none;
       justify-content: center;
       align-items: center;
@@ -155,15 +182,15 @@
       border-radius: 25px;
       padding: 30px 20px;
       border-top: 8px solid var(--accent);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.1);
       position: relative;
-      animation: expandIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: expandIn 0.3s ease-out;
       max-height: 90vh;
       overflow-y: auto;
       box-sizing: border-box;
     }
     @keyframes expandIn {
-      from { transform: scale(0.8); opacity: 0; }
+      from { transform: scale(0.95); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
 
@@ -176,15 +203,9 @@
       z-index: 10;
     }
 
-    /* 對話區域佈局 (展開後) */
-    .chat-area { display: flex; align-items: flex-start; margin-top: 15px; margin-bottom: 25px; }
+    .chat-area { display: flex; align-items: flex-start; margin-top: 15px; margin-bottom: 15px; }
     .person-icon { font-size: 45px; margin-right: 12px; flex-shrink: 0; }
     
-    @media (max-width: 480px) {
-      .person-icon { font-size: 35px; margin-right: 8px; }
-      .expanded-card { padding: 25px 15px; }
-    }
-
     .speech-bubble { 
       position: relative; background: rgba(255, 255, 255, 0.9); border-radius: 20px; 
       padding: 15px 18px; flex-grow: 1; border: 1px solid rgba(0, 0, 0, 0.05);
@@ -197,10 +218,24 @@
     .situation-inline { font-size: 0.85em; color: var(--gray); margin-bottom: 6px; font-weight: bold; }
     .question-content { font-size: 1.15em; line-height: 1.5; font-weight: bold; }
 
-    /* 回答列表 */
+    .submit-ans-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 0.95em;
+    }
+    .submit-ans-btn:hover { background: var(--secondary); transform: translateY(-2px); }
+
     .answers-container {
-      margin-top: 15px;
-      padding-top: 15px;
+      margin-top: 20px;
+      padding-top: 20px;
       border-top: 2px dashed rgba(0,0,0,0.05);
     }
     .answer-item {
@@ -208,13 +243,13 @@
       border-left: 4px solid var(--accent); font-size: 0.9em;
     }
     .answer-text { white-space: pre-line; color: #37474f; font-weight: 500; }
-    .nickname { font-size: 0.8em; color: var(--gray); margin-left: 8px; }
+    .nickname { font-size: 0.85em; color: var(--gray); margin-left: 8px; }
 
-    /* 下方跳轉按鈕 */
+    /* 下方導覽 */
     .nav-section {
       text-align: center; width: 100%; max-width: 500px;
       margin-top: 25px; padding: 20px; font-size: 0.9em; color: #546e7a;
-      background: rgba(255, 255, 255, 0.5); border-radius: 15px;
+      background: rgba(255, 255, 255, 0.4); border-radius: 15px;
       box-sizing: border-box;
     }
     .link-btn {
@@ -233,7 +268,7 @@
     .spinner-img { 
       width: 80px; height: 80px; object-fit: cover; border-radius: 50%;
       animation: spin 2s linear infinite; margin-bottom: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -242,14 +277,12 @@
 </head>
 <body>
 
-  <!-- 讀取遮罩 -->
   <div id="loader" class="loading-overlay">
     <img src="1.png" alt="Loading" class="spinner-img" onerror="this.style.display='none'; document.getElementById('fallback-spinner').style.display='block';">
     <div id="fallback-spinner" style="display:none; width:45px; height:45px; border:5px solid rgba(0, 139, 163, 0.1); border-left-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
     <div style="font-weight: bold; color: var(--primary)">布偶正在整理題目...</div>
   </div>
 
-  <!-- 展開對話框 -->
   <div id="modal" class="modal-overlay" onclick="closeCard(event)">
     <div class="expanded-card" onclick="event.stopPropagation()">
       <div class="close-btn" onclick="closeCard()">✕</div>
@@ -263,6 +296,8 @@
         </div>
       </div>
       
+      <button class="submit-ans-btn" onclick="goToSubmitSpecific()">我也要提供建議！🐾</button>
+      
       <div id="exp-answers" class="answers-container"></div>
     </div>
   </div>
@@ -270,7 +305,26 @@
   <div class="header-section">
     <h1>馬內生存模擬器</h1>
     <div class="subtitle">
-      新手馬內救星！<br>場次前先預習可能會被問什麼奇怪的問題！<br>不知道該怎麼回的話，點擊卡片就能看到其他人的應對方法。
+      新手馬內救星！<br>
+      場次前先預習可能會被問什麼奇怪的問題！<br>
+      不知道該怎麼回的話，點擊卡片就能看到其他人的應對方法。
+    </div>
+  </div>
+
+  <!-- 篩選與排序面板 -->
+  <div class="controls-panel">
+    <div class="control-group">
+      <div class="control-label">難度篩選</div>
+      <button class="filter-btn active" onclick="toggleFilter('基礎', this)">基礎</button>
+      <button class="filter-btn active" onclick="toggleFilter('低', this)">低</button>
+      <button class="filter-btn active" onclick="toggleFilter('中', this)">中</button>
+      <button class="filter-btn active" onclick="toggleFilter('高', this)">高</button>
+    </div>
+    <div class="control-group">
+      <div class="control-label">題目排序</div>
+      <button id="sort-random" class="filter-btn active" onclick="setSort('random')">無序</button>
+      <button id="sort-asc" class="filter-btn" onclick="setSort('asc')">難度升序</button>
+      <button id="sort-desc" class="filter-btn" onclick="setSort('desc')">難度應降序</button>
     </div>
   </div>
 
@@ -280,7 +334,7 @@
 
   <div class="nav-section">
     遇到了其他沒在上面的問題，或者想提供你的回答方法？<br>
-    <a class="link-btn" onclick="goToSubmit()">📝 前往提交介面</a>
+    <a class="link-btn" onclick="goToSubmitGeneral()">我有想法！💡</a>
   </div>
 
   <div class="footer">
@@ -290,50 +344,96 @@
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
   
-  let allQuestions = [];
+  let rawQuestions = []; // 原始資料
+  let currentFilters = ['基礎', '低', '中', '高'];
+  let currentSort = 'random';
+  let currentSelectedQuestionId = null;
+
+  const diffWeight = { '基礎': 1, '低': 2, '中': 3, '高': 4 };
 
   async function init() {
     try {
       const response = await fetch(`${API_URL}?action=getQA`);
       if (!response.ok) throw new Error('網路回應不正確');
-      allQuestions = await response.json();
-      allQuestions.sort(() => Math.random() - 0.5);
+      rawQuestions = await response.json();
+      
       document.getElementById('loader').style.display = 'none';
-      renderGrid();
+      applyAndRender();
     } catch (error) {
       console.error(error);
       document.getElementById('loader').innerHTML = "<div style='color:red;padding:20px;text-align:center;'>載入資料失敗。</div>";
     }
   }
 
-  function renderGrid() {
+  // 篩選與排序邏輯
+  function applyAndRender() {
+    // 1. 篩選
+    let displayList = rawQuestions.filter(q => currentFilters.includes(q.difficulty || '基礎'));
+
+    // 2. 排序
+    if (currentSort === 'random') {
+      displayList.sort(() => Math.random() - 0.5);
+    } else if (currentSort === 'asc') {
+      displayList.sort((a, b) => (diffWeight[a.difficulty] || 1) - (diffWeight[b.difficulty] || 1));
+    } else if (currentSort === 'desc') {
+      displayList.sort((a, b) => (diffWeight[b.difficulty] || 1) - (diffWeight[a.difficulty] || 1));
+    }
+
+    renderGrid(displayList);
+  }
+
+  function renderGrid(list) {
     const grid = document.getElementById('quiz-grid');
     grid.innerHTML = '';
 
-    allQuestions.forEach((q, index) => {
+    list.forEach((q) => {
       const diff = q.difficulty || "基礎";
       const card = document.createElement('div');
       card.className = 'mini-card';
       card.style.backgroundColor = `var(--diff-bg-${diff})`;
-      card.onclick = () => openCard(index);
+      
+      // 點擊卡片本體展開
+      card.onclick = () => openCardByData(q);
 
       card.innerHTML = `
-        <div class="diff-tag" style="color:var(--diff-text-${diff})">難度：${diff}</div>
+        <div class="card-top">
+          <div class="diff-tag" style="color:var(--diff-text-${diff})">難度：${diff}</div>
+          <div class="mini-submit-btn" onclick="event.stopPropagation(); goToSpecificId('${q.id}')">✎ 提供答案</div>
+        </div>
         <div class="q-preview" style="color:var(--diff-text-${diff})">「${q.content}」</div>
       `;
       grid.appendChild(card);
     });
   }
 
-  function openCard(index) {
-    const q = allQuestions[index];
+  function toggleFilter(diff, btn) {
+    if (currentFilters.includes(diff)) {
+      if (currentFilters.length === 1) return; // 至少留一個
+      currentFilters = currentFilters.filter(d => d !== diff);
+      btn.classList.remove('active');
+    } else {
+      currentFilters.push(diff);
+      btn.classList.add('active');
+    }
+    applyAndRender();
+  }
+
+  function setSort(type) {
+    currentSort = type;
+    document.querySelectorAll('[id^="sort-"]').forEach(b => b.classList.remove('active'));
+    document.getElementById(`sort-${type}`).classList.add('active');
+    applyAndRender();
+  }
+
+  function openCardByData(q) {
+    currentSelectedQuestionId = q.id;
     const diff = q.difficulty || "基礎";
     const modal = document.getElementById('modal');
     const expCard = document.querySelector('.expanded-card');
 
     document.getElementById('exp-diff').innerText = "難度：" + diff;
     document.getElementById('exp-diff').style.color = `var(--diff-text-${diff})`;
-    document.getElementById('exp-sit').innerText = q.situation ? q.situation : "";
+    document.getElementById('exp-sit').innerText = q.situation || "";
     document.getElementById('exp-sit').style.display = q.situation ? "block" : "none";
     document.getElementById('exp-q').innerText = `「${q.content}」`;
     document.getElementById('exp-q').style.color = `var(--diff-text-${diff})`;
@@ -360,9 +460,20 @@
     document.body.style.overflow = 'auto';
   }
 
-  function goToSubmit() {
-    const targetUrl = "https://script.google.com/macros/s/AKfycbzM73d764og_Ke8BTTZQkRWgam-o1oub1vw26TahVzHBtopsiUvfOR3QyXliftKSEvvuw/exec";
-    window.open(targetUrl, '_top');
+  function goToSpecificId(id) {
+    google.script.run.withSuccessHandler(function(url) {
+      window.top.location.href = url + "?q_id=" + id;
+    }).getScriptUrl();
+  }
+
+  function goToSubmitSpecific() {
+    if (currentSelectedQuestionId) goToSpecificId(currentSelectedQuestionId);
+  }
+
+  function goToSubmitGeneral() {
+    google.script.run.withSuccessHandler(function(url) {
+      window.top.location.href = url;
+    }).getScriptUrl();
   }
 
   window.onload = init;
