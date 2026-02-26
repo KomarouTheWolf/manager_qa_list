@@ -10,17 +10,21 @@
       --primary: #008ba3; 
       --secondary: #00acc1;
       --bg: #f0fbfc; 
-      --card-bg: #ffffff;
-      --bubble-bg: #e0f7fa; 
       --accent: #cfb53b;
       --text: #2c3e50;
       --gray: #90a4ae;
       
-      /* 難度顏色定義 */
-      --diff-基礎: #008ba3;
-      --diff-低: #2196f3;
-      --diff-中: #f57c00;
-      --diff-高: #d32f2f;
+      /* 難度對應的圖卡背景色 (柔和系列) */
+      --diff-bg-基礎: #e0f7fa; 
+      --diff-bg-低: #e3f2fd; 
+      --diff-bg-中: #fff3e0; 
+      --diff-bg-高: #ffebee;
+
+      /* 難度對應的文字深色 */
+      --diff-text-基礎: #006064;
+      --diff-text-低: #0d47a1;
+      --diff-text-中: #e65100;
+      --diff-text-高: #b71c1c;
     }
     
     body { 
@@ -35,161 +39,167 @@
       min-height: 100vh;
     }
     
-    .header-section { text-align: center; margin-bottom: 30px; width: 100%; max-width: 500px; }
-    h1 { color: var(--primary); margin-bottom: 8px; letter-spacing: 1px; font-size: 1.8em; }
-    .subtitle { color: var(--secondary); font-size: 0.95em; font-weight: 500; line-height: 1.6; }
+    .header-section { text-align: center; margin-bottom: 20px; width: 100%; max-width: 500px; }
+    h1 { color: var(--primary); margin-bottom: 8px; letter-spacing: 1px; font-size: 1.6em; }
+    .subtitle { color: var(--secondary); font-size: 0.85em; font-weight: 500; line-height: 1.5; }
+
+    /* 進度指示器 */
+    .progress-bar {
+      width: 100%;
+      max-width: 500px;
+      height: 4px;
+      background: #e0f2f1;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    #progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s;
+    }
 
     /* 練習圖卡容器 */
     .card-container {
       width: 100%;
       max-width: 500px;
-      perspective: 1000px; /* 為 3D 效果預留 */
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      position: relative;
     }
 
     .quiz-card {
-      background: var(--card-bg);
+      background: white;
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 139, 163, 0.15);
+      box-shadow: 0 10px 25px rgba(0, 139, 163, 0.1);
       border-top: 6px solid var(--accent);
-      padding: 35px 30px;
+      padding: 30px 20px;
       box-sizing: border-box;
+      min-height: 380px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      position: relative;
-      min-height: 320px;
-      justify-content: center;
+      transition: background-color 0.4s ease;
     }
 
     /* 難度標籤 */
     .difficulty-tag {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 0.85em;
+      text-align: right;
+      font-size: 0.8em;
       font-weight: bold;
-    }
-
-    .situation-text {
-      font-size: 0.9em;
-      color: var(--gray);
       margin-bottom: 15px;
-      text-align: center;
+      text-transform: uppercase;
     }
 
-    /* 題目內容：根據難度顯色 */
-    .question-content {
-      font-size: 1.4em;
-      font-weight: bold;
-      text-align: center;
-      line-height: 1.6;
-      margin-bottom: 30px;
-      transition: color 0.3s;
+    /* 對話區域佈局 (復刻 index.html) */
+    .chat-area { 
+      display: flex; 
+      align-items: flex-start; 
+      margin-bottom: 20px; 
+      flex-grow: 1;
+    }
+    .person-icon { font-size: 40px; margin-right: 12px; flex-shrink: 0; filter: opacity(0.7); }
+    
+    .speech-bubble { 
+      position: relative; 
+      background: rgba(255, 255, 255, 0.6); /* 半透明白色讓背景色透出來 */
+      border-radius: 15px; 
+      padding: 15px 18px; 
+      flex-grow: 1; 
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .speech-bubble::after { 
+      content: ''; position: absolute; left: -10px; top: 15px; 
+      border-width: 10px 10px 10px 0; border-style: solid; 
+      border-color: transparent rgba(255, 255, 255, 0.6) transparent transparent; 
     }
 
-    /* 完成畫面樣式 */
-    #finish-screen {
-      display: none;
-      text-align: center;
-    }
-    #finish-screen h3 { color: var(--primary); margin-bottom: 10px; }
-    #finish-screen p { color: var(--gray); font-size: 0.9em; margin-bottom: 20px; }
+    .situation-inline { font-size: 0.85em; color: var(--gray); margin-bottom: 6px; line-height: 1.4; }
+    .question-content { font-size: 1.15em; line-height: 1.5; font-weight: bold; color: inherit; }
 
-    /* 按鈕樣式 */
-    .btn-group { width: 100%; margin-top: auto; }
+    /* 控制按鈕 */
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 15px;
+    }
     button {
-      width: 100%;
-      padding: 14px;
+      padding: 12px;
       border: none;
       border-radius: 12px;
-      font-size: 1em;
+      font-size: 0.95em;
       font-weight: bold;
       cursor: pointer;
-      transition: all 0.2s ease;
-      margin-bottom: 12px;
+      transition: 0.2s;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
     }
+    .nav-btn { background: var(--primary); color: white; flex: 1; }
+    .nav-btn:disabled { background: #cfd8dc; cursor: not-allowed; }
+    .nav-btn:hover:not(:disabled) { background: var(--secondary); transform: translateY(-2px); }
 
-    .main-btn {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 4px 12px rgba(0, 139, 163, 0.2);
-    }
-    .main-btn:hover { background: var(--secondary); transform: translateY(-2px); }
-    .main-btn:active { transform: translateY(0); }
-
-    .accent-btn {
+    .toggle-ans-btn {
+      width: 100%;
       background: white;
       color: var(--primary);
       border: 2px solid var(--primary);
+      margin-top: 15px;
     }
-    .accent-btn:hover { background: var(--bg); }
 
     /* 回答區塊 */
     .answers-container {
-      width: 100%;
       display: none;
-      margin-top: 20px;
-      border-top: 2px dashed #e0f2f1;
-      padding-top: 20px;
-      max-height: 300px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px dashed rgba(0,0,0,0.1);
+      max-height: 200px;
       overflow-y: auto;
     }
     .answers-container.active { display: block; }
-    
     .answer-item {
-      background: var(--bubble-bg);
-      padding: 12px 15px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      font-size: 0.95em;
-      line-height: 1.6;
-      border-left: 4px solid var(--accent);
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      border-left: 3px solid var(--accent);
     }
-    .answer-text { color: #006064; font-weight: 500; white-space: pre-line; }
-    .nickname { font-size: 0.8em; color: var(--gray); margin-left: 8px; }
+    .answer-text { white-space: pre-line; color: #37474f; }
+    .nickname { font-size: 0.8em; color: var(--gray); margin-left: 5px; }
 
-    /* 下方跳轉區塊 */
+    /* 下方導覽 */
     .nav-section {
       text-align: center;
       width: 100%;
       max-width: 500px;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 40px;
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 0.9em;
+      color: #546e7a;
     }
-    .nav-text { font-size: 0.9em; color: #546e7a; margin-bottom: 15px; line-height: 1.5; }
     .link-btn {
       color: var(--primary);
       text-decoration: none;
       font-weight: bold;
-      font-size: 0.95em;
-      padding: 8px 25px;
-      border: 1.5px solid var(--primary);
-      border-radius: 20px;
+      margin-top: 10px;
       display: inline-block;
-      transition: 0.3s;
+      border-bottom: 1px solid var(--primary);
     }
-    .link-btn:hover { background: var(--primary); color: white; }
 
-    /* 讀取中轉圈 */
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg); display: flex; flex-direction: column;
       justify-content: center; align-items: center; z-index: 100;
     }
     .spinner { 
-      width: 40px; height: 40px; border: 5px solid rgba(0, 139, 163, 0.1); 
+      width: 40px; height: 40px; border: 4px solid rgba(0, 139, 163, 0.1); 
       border-left-color: var(--primary); border-radius: 50%; 
       animation: spin 1s linear infinite; margin-bottom: 15px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .footer { text-align: center; margin-top: auto; padding-bottom: 20px; font-size: 0.85em; color: var(--gray); }
+    .footer { text-align: center; margin-top: auto; padding: 20px; font-size: 0.8em; color: var(--gray); }
   </style>
 </head>
 <body>
@@ -197,46 +207,45 @@
   <!-- 讀取遮罩 -->
   <div id="loader" class="loading-overlay">
     <div class="spinner"></div>
-    <div>馬內正在搬運講義資料中...</div>
+    <div>正在整理圖卡...</div>
   </div>
 
   <div class="header-section">
     <h1>馬內用考古題練習器</h1>
     <div class="subtitle">
-      新手馬內救星！<br>
-      在場次前先預習可能會被民眾問什麼奇怪的問題！
+      新手馬內救星！場次前先預習可能會被問什麼奇怪的問題！
     </div>
+  </div>
+
+  <div class="progress-bar">
+    <div id="progress-fill"></div>
   </div>
 
   <div class="card-container">
     <div id="quiz-card" class="quiz-card">
-      <!-- 進行中介面 -->
-      <div id="quiz-active-area" style="width:100%">
-        <div id="q-difficulty" class="difficulty-tag"></div>
-        <div id="q-situation" class="situation-text"></div>
-        <div id="q-content" class="question-content"></div>
-        
-        <div class="btn-group">
-          <button class="main-btn" onclick="nextQuestion()">下一題 (隨機)</button>
-          <button id="toggle-ans-btn" class="accent-btn" onclick="toggleAnswers()">看看其他人的回答方法！</button>
-        </div>
-
-        <div id="answers-list" class="answers-container">
-          <!-- 回答動態生成 -->
+      <div id="q-difficulty" class="difficulty-tag">難度：載入中</div>
+      
+      <div class="chat-area">
+        <div class="person-icon">👤</div>
+        <div class="speech-bubble">
+          <div id="q-situation" class="situation-inline"></div>
+          <div id="q-content" class="question-content">讀取中...</div>
         </div>
       </div>
-
-      <!-- 完成介面 -->
-      <div id="finish-screen">
-        <h3>🎉 恭喜！考古題全部翻完了！</h3>
-        <p>你已經預習了目前資料庫中所有的問題。<br>準備好去場次實戰了嗎？</p>
-        <button class="main-btn" onclick="resetQuiz()">重新開始練習</button>
+      
+      <button id="toggle-ans-btn" class="toggle-ans-btn" onclick="toggleAnswers()">看看其他人的回答方法！</button>
+      
+      <div id="answers-list" class="answers-container"></div>
+      
+      <div class="nav-controls">
+        <button id="prev-btn" class="nav-btn" onclick="changeQuestion(-1)">← 上一題</button>
+        <button id="next-btn" class="nav-btn" onclick="changeQuestion(1)">下一題 →</button>
       </div>
     </div>
   </div>
 
   <div class="nav-section">
-    <div class="nav-text">遇到了其他沒在上面的問題，或者想提供你的回答方法？</div>
+    遇到了其他沒在上面的問題，或者想提供你的回答方法？<br>
     <a href="javascript:void(0)" class="link-btn" onclick="goToSubmit()">📝 前往提交介面</a>
   </div>
 
@@ -248,72 +257,79 @@
   // 重要：請替換成你部署後的 GAS Web App 網址
   const API_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
   
-  let allData = [];
-  let remainingPool = [];
-  let currentQuestion = null;
+  let allQuestions = [];
+  let currentIndex = 0;
 
   // 1. 初始化讀取
   async function init() {
     try {
       const response = await fetch(`${API_URL}?action=getQA`);
-      allData = await response.json();
+      const data = await response.json();
+      
+      // 隨機排序
+      allQuestions = data.sort(() => Math.random() - 0.5);
+      
       document.getElementById('loader').style.display = 'none';
-      resetQuiz();
+      renderCard();
     } catch (error) {
       console.error(error);
-      alert("讀取資料失敗。請檢查 API 網址，並確保後端已正確部署。");
+      alert("讀取資料失敗。請檢查 API 網址並重新整理。");
     }
   }
 
-  // 2. 重置練習進度
-  function resetQuiz() {
-    remainingPool = [...allData];
-    // 打亂順序
-    remainingPool.sort(() => Math.random() - 0.5);
-    
-    document.getElementById('finish-screen').style.display = 'none';
-    document.getElementById('quiz-active-area').style.display = 'block';
-    nextQuestion();
-  }
+  // 2. 渲染當前題目
+  function renderCard() {
+    if (allQuestions.length === 0) return;
 
-  // 3. 抽取下一題
-  function nextQuestion() {
-    if (remainingPool.length === 0) {
-      showFinishScreen();
-      return;
-    }
-
-    // 取得下一題
-    currentQuestion = remainingPool.pop();
-
-    // 更新介面
+    const q = allQuestions[currentIndex];
+    const card = document.getElementById('quiz-card');
     const qContent = document.getElementById('q-content');
     const qDiff = document.getElementById('q-difficulty');
-    
-    document.getElementById('q-situation').innerText = currentQuestion.situation ? currentQuestion.situation : "";
-    qContent.innerText = `「${currentQuestion.content}」`;
-    
-    // 難度顯色邏輯
-    const diff = currentQuestion.difficulty || "基礎";
-    qDiff.innerText = "難度：" + diff;
-    qDiff.style.color = `var(--diff-${diff})`;
-    qContent.style.color = `var(--diff-${diff})`;
-    
-    // 隱藏回答區
+    const sitText = document.getElementById('q-situation');
     const list = document.getElementById('answers-list');
+    const toggleBtn = document.getElementById('toggle-ans-btn');
+
+    // 更新內容
+    sitText.innerText = q.situation ? q.situation : "";
+    sitText.style.display = q.situation ? "block" : "none";
+    qContent.innerText = `「${q.content}」`;
+    
+    // 更新難度與背景顏色
+    const diff = q.difficulty || "基礎";
+    qDiff.innerText = "難度：" + diff;
+    card.style.backgroundColor = `var(--diff-bg-${diff})`;
+    card.style.color = `var(--diff-text-${diff})`;
+    
+    // 重置回答區域
     list.classList.remove('active');
     list.innerHTML = "";
-    document.getElementById('toggle-ans-btn').innerText = "看看其他人的回答方法！";
-    document.getElementById('toggle-ans-btn').style.display = currentQuestion.answers.length > 0 ? "flex" : "none";
+    toggleBtn.innerText = "看看其他人的回答方法！";
+    toggleBtn.style.display = q.answers.length > 0 ? "block" : "none";
+
+    // 更新按鈕狀態
+    document.getElementById('prev-btn').disabled = (currentIndex === 0);
+    document.getElementById('next-btn').innerText = (currentIndex === allQuestions.length - 1) ? "全部完成！" : "下一題 →";
+
+    // 更新進度條
+    const progress = ((currentIndex + 1) / allQuestions.length) * 100;
+    document.getElementById('progress-fill').style.width = progress + "%";
   }
 
-  // 4. 顯示完成畫面
-  function showFinishScreen() {
-    document.getElementById('quiz-active-area').style.display = 'none';
-    document.getElementById('finish-screen').style.display = 'block';
+  // 3. 切換題目
+  function changeQuestion(step) {
+    const newIndex = currentIndex + step;
+    
+    if (newIndex >= 0 && newIndex < allQuestions.length) {
+      currentIndex = newIndex;
+      renderCard();
+    } else if (newIndex >= allQuestions.length) {
+      if(confirm("恭喜你練習完所有考古題了！要再練習一次嗎？")) {
+        location.reload();
+      }
+    }
   }
 
-  // 5. 切換回答顯示
+  // 4. 切換回答顯示
   function toggleAnswers() {
     const list = document.getElementById('answers-list');
     const btn = document.getElementById('toggle-ans-btn');
@@ -321,26 +337,26 @@
     
     if (isActive) {
       btn.innerText = "隱藏建議回答";
-      // 生成回答列表
-      list.innerHTML = currentQuestion.answers.map(ans => `
+      const q = allQuestions[currentIndex];
+      list.innerHTML = q.answers.map(ans => `
         <div class="answer-item">
           <span class="answer-text">「${ans.content}」</span>
           <span class="nickname">${ans.nickname}</span>
         </div>
       `).join('');
-      
-      // 自動滾動到底部
-      setTimeout(() => {
-        list.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
     } else {
       btn.innerText = "看看其他人的回答方法！";
     }
   }
 
-  // 6. 跳轉到提交頁面
+  // 5. 鍵盤支援
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') changeQuestion(-1);
+    if (e.key === 'ArrowRight') changeQuestion(1);
+  });
+
+  // 6. 跳轉提交
   function goToSubmit() {
-    // 嘗試向後端請求原始連結，若是在 GitHub Pages 建議直接寫死 index 網址
     google.script.run.withSuccessHandler(function(url) {
       window.top.location.href = url;
     }).getScriptUrl();
