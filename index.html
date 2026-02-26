@@ -31,27 +31,44 @@
       background: var(--bg); 
       color: var(--text); 
       margin: 0; 
-      padding: 20px; 
+      padding: 15px; /* 手機版縮小間距 */
       display: flex; 
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+      box-sizing: border-box;
+      overflow-x: hidden; /* 防止水平滾動 */
     }
     
     /* 標題區域強化 */
-    .header-section { text-align: center; margin-bottom: 35px; width: 100%; }
+    .header-section { text-align: center; margin-bottom: 35px; width: 100%; box-sizing: border-box; }
     h1 { 
       display: inline-block;
       background: var(--primary); 
       color: white; 
-      padding: 12px 80px; /* 加長色塊 */
+      padding: 12px 80px; 
       border-radius: 15px; 
       box-shadow: 0 4px 15px rgba(0, 139, 163, 0.2);
       margin-bottom: 15px; 
       letter-spacing: 3px; 
       font-size: 1.8em; 
-      white-space: nowrap;
+      white-space: normal; /* 允許手機版換行 */
+      max-width: 90%; /* 確保標題不超出螢幕 */
+      word-wrap: break-word;
     }
+
+    /* 手機版標題優化 */
+    @media (max-width: 600px) {
+      h1 {
+        padding: 12px 30px; 
+        font-size: 1.4em;
+        letter-spacing: 1px;
+      }
+      body {
+        padding: 10px;
+      }
+    }
+
     .subtitle { 
       color: var(--primary); 
       font-size: 0.95em; 
@@ -61,17 +78,26 @@
       padding: 12px 20px;
       border-radius: 12px;
       display: inline-block;
-      max-width: 600px;
+      max-width: 90%;
+      box-sizing: border-box;
     }
 
     /* 網格容器 */
     .quiz-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      gap: 15px;
       width: 100%;
       max-width: 1200px;
       margin-bottom: 40px;
+      box-sizing: border-box;
+    }
+
+    /* 針對超窄螢幕（如 iPhone SE）的調整 */
+    @media (max-width: 320px) {
+      .quiz-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* 小卡片樣式 */
@@ -87,6 +113,7 @@
       display: flex;
       flex-direction: column;
       height: 160px;
+      box-sizing: border-box;
     }
     .mini-card:hover {
       transform: translateY(-8px);
@@ -118,18 +145,22 @@
       justify-content: center;
       align-items: center;
       z-index: 200;
-      padding: 20px;
+      padding: 15px;
+      box-sizing: border-box;
     }
     .expanded-card {
       background: white;
       width: 100%;
       max-width: 500px;
       border-radius: 25px;
-      padding: 35px 25px;
+      padding: 30px 20px;
       border-top: 8px solid var(--accent);
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
       position: relative;
       animation: expandIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-height: 90vh;
+      overflow-y: auto;
+      box-sizing: border-box;
     }
     @keyframes expandIn {
       from { transform: scale(0.8); opacity: 0; }
@@ -142,43 +173,49 @@
       font-size: 1.5em;
       cursor: pointer;
       color: var(--gray);
+      z-index: 10;
     }
 
     /* 對話區域佈局 (展開後) */
     .chat-area { display: flex; align-items: flex-start; margin-top: 15px; margin-bottom: 25px; }
-    .person-icon { font-size: 45px; margin-right: 15px; flex-shrink: 0; }
+    .person-icon { font-size: 45px; margin-right: 12px; flex-shrink: 0; }
+    
+    @media (max-width: 480px) {
+      .person-icon { font-size: 35px; margin-right: 8px; }
+      .expanded-card { padding: 25px 15px; }
+    }
+
     .speech-bubble { 
       position: relative; background: rgba(255, 255, 255, 0.9); border-radius: 20px; 
-      padding: 18px 22px; flex-grow: 1; border: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 15px 18px; flex-grow: 1; border: 1px solid rgba(0, 0, 0, 0.05);
     }
     .speech-bubble::after { 
-      content: ''; position: absolute; left: -10px; top: 20px; 
+      content: ''; position: absolute; left: -10px; top: 15px; 
       border-width: 10px 10px 10px 0; border-style: solid; 
       border-color: transparent white transparent transparent; 
     }
-    .situation-inline { font-size: 0.9em; color: var(--gray); margin-bottom: 8px; font-weight: bold; }
-    .question-content { font-size: 1.25em; line-height: 1.6; font-weight: bold; }
+    .situation-inline { font-size: 0.85em; color: var(--gray); margin-bottom: 6px; font-weight: bold; }
+    .question-content { font-size: 1.15em; line-height: 1.5; font-weight: bold; }
 
     /* 回答列表 */
     .answers-container {
-      margin-top: 20px;
-      padding-top: 20px;
+      margin-top: 15px;
+      padding-top: 15px;
       border-top: 2px dashed rgba(0,0,0,0.05);
-      max-height: 300px;
-      overflow-y: auto;
     }
     .answer-item {
       background: #f8fcfd; padding: 12px 15px; border-radius: 12px; margin-bottom: 12px;
-      border-left: 4px solid var(--accent); font-size: 0.95em;
+      border-left: 4px solid var(--accent); font-size: 0.9em;
     }
     .answer-text { white-space: pre-line; color: #37474f; font-weight: 500; }
-    .nickname { font-size: 0.85em; color: var(--gray); margin-left: 8px; }
+    .nickname { font-size: 0.8em; color: var(--gray); margin-left: 8px; }
 
     /* 下方跳轉按鈕 */
     .nav-section {
       text-align: center; width: 100%; max-width: 500px;
-      margin-top: 25px; padding: 20px; font-size: 0.95em; color: #546e7a;
+      margin-top: 25px; padding: 20px; font-size: 0.9em; color: #546e7a;
       background: rgba(255, 255, 255, 0.5); border-radius: 15px;
+      box-sizing: border-box;
     }
     .link-btn {
       color: var(--primary); text-decoration: none; font-weight: bold; margin-top: 15px;
@@ -187,7 +224,7 @@
     }
     .link-btn:hover { background: var(--primary); color: white; }
 
-    /* Loading 轉圈：使用 1.png */
+    /* Loading 轉圈 */
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg); display: flex; flex-direction: column;
@@ -200,7 +237,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .footer { text-align: center; margin-top: auto; padding: 30px; font-size: 0.85em; color: var(--gray); }
+    .footer { text-align: center; margin-top: auto; padding: 30px; font-size: 0.8em; color: var(--gray); }
   </style>
 </head>
 <body>
@@ -209,7 +246,7 @@
   <div id="loader" class="loading-overlay">
     <img src="1.png" alt="Loading" class="spinner-img" onerror="this.style.display='none'; document.getElementById('fallback-spinner').style.display='block';">
     <div id="fallback-spinner" style="display:none; width:45px; height:45px; border:5px solid rgba(0, 139, 163, 0.1); border-left-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-    <div style="font-weight: bold; color: var(--primary)">布偶正在整理考古題網格...</div>
+    <div style="font-weight: bold; color: var(--primary)">布偶正在整理題目...</div>
   </div>
 
   <!-- 展開對話框 -->
@@ -233,7 +270,7 @@
   <div class="header-section">
     <h1>馬內生存模擬器</h1>
     <div class="subtitle">
-      新手馬內救星！<br>場次前先預習可能會被問什麼奇怪的問題！點擊題目展開看看大家的應對方法。
+      新手馬內救星！<br>場次前先預習可能會被問什麼奇怪的問題！<br>不知道該怎麼回的話，點擊卡片就能看到其他人的應對方法。
     </div>
   </div>
 
@@ -251,7 +288,6 @@
   </div>
 
 <script>
-  // 部署後的 GAS Web App 網址
   const API_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
   
   let allQuestions = [];
@@ -261,15 +297,12 @@
       const response = await fetch(`${API_URL}?action=getQA`);
       if (!response.ok) throw new Error('網路回應不正確');
       allQuestions = await response.json();
-      
-      // 隨機打亂順序增加新鮮感
       allQuestions.sort(() => Math.random() - 0.5);
-      
       document.getElementById('loader').style.display = 'none';
       renderGrid();
     } catch (error) {
       console.error(error);
-      document.getElementById('loader').innerHTML = "<div style='color:red;padding:20px;text-align:center;'>載入資料失敗。<br>請確認後端權限設定。</div>";
+      document.getElementById('loader').innerHTML = "<div style='color:red;padding:20px;text-align:center;'>載入資料失敗。</div>";
     }
   }
 
@@ -300,16 +333,12 @@
 
     document.getElementById('exp-diff').innerText = "難度：" + diff;
     document.getElementById('exp-diff').style.color = `var(--diff-text-${diff})`;
-    
     document.getElementById('exp-sit').innerText = q.situation ? q.situation : "";
     document.getElementById('exp-sit').style.display = q.situation ? "block" : "none";
-    
     document.getElementById('exp-q').innerText = `「${q.content}」`;
     document.getElementById('exp-q').style.color = `var(--diff-text-${diff})`;
-    
     expCard.style.backgroundColor = `var(--diff-bg-${diff})`;
 
-    // 渲染回答
     const ansContainer = document.getElementById('exp-answers');
     if (q.answers && q.answers.length > 0) {
       ansContainer.innerHTML = q.answers.map(ans => `
@@ -318,14 +347,12 @@
           <span class="nickname">${ans.nickname}</span>
         </div>
       `).join('');
-      ansContainer.style.display = 'block';
     } else {
       ansContainer.innerHTML = '<div style="text-align:center;color:#999;font-size:0.9em;padding:10px;">尚未有精選回答</div>';
-      ansContainer.style.display = 'block';
     }
 
     modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // 防止背景滾動
+    document.body.style.overflow = 'hidden';
   }
 
   function closeCard() {
