@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>馬內用考古題練習器</title>
+  <style>
+    /* 配色採用角色方案：青藍 (#008ba3)、白色 (#ffffff)、金黃 (#cfb53b) */
+    :root { 
+      --primary: #008ba3; 
+      --secondary: #00acc1;
+      --bg: #f0fbfc; 
+      --card-bg: #ffffff;
+      --bubble-bg: #e0f7fa; 
+      --accent: #cfb53b;
+      --text: #2c3e50;
+      --gray: #90a4ae;
+      
+      /* 難度顏色定義 */
+      --diff-基礎: #008ba3;
+      --diff-低: #2196f3;
+      --diff-中: #f57c00;
+      --diff-高: #d32f2f;
+    }
+    
+    body { 
+      font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; 
+      background: var(--bg); 
+      color: var(--text); 
+      margin: 0; 
+      padding: 20px; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .header-section { text-align: center; margin-bottom: 30px; width: 100%; max-width: 500px; }
+    h1 { color: var(--primary); margin-bottom: 8px; letter-spacing: 1px; font-size: 1.8em; }
+    .subtitle { color: var(--secondary); font-size: 0.95em; font-weight: 500; line-height: 1.6; }
+
+    /* 練習圖卡容器 */
+    .card-container {
+      width: 100%;
+      max-width: 500px;
+      perspective: 1000px; /* 為 3D 效果預留 */
+      margin-bottom: 30px;
+    }
+
+    .quiz-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 139, 163, 0.15);
+      border-top: 6px solid var(--accent);
+      padding: 35px 30px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      min-height: 320px;
+      justify-content: center;
+    }
+
+    /* 難度標籤 */
+    .difficulty-tag {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+
+    .situation-text {
+      font-size: 0.9em;
+      color: var(--gray);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    /* 題目內容：根據難度顯色 */
+    .question-content {
+      font-size: 1.4em;
+      font-weight: bold;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      transition: color 0.3s;
+    }
+
+    /* 完成畫面樣式 */
+    #finish-screen {
+      display: none;
+      text-align: center;
+    }
+    #finish-screen h3 { color: var(--primary); margin-bottom: 10px; }
+    #finish-screen p { color: var(--gray); font-size: 0.9em; margin-bottom: 20px; }
+
+    /* 按鈕樣式 */
+    .btn-group { width: 100%; margin-top: auto; }
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .main-btn {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 139, 163, 0.2);
+    }
+    .main-btn:hover { background: var(--secondary); transform: translateY(-2px); }
+    .main-btn:active { transform: translateY(0); }
+
+    .accent-btn {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    .accent-btn:hover { background: var(--bg); }
+
+    /* 回答區塊 */
+    .answers-container {
+      width: 100%;
+      display: none;
+      margin-top: 20px;
+      border-top: 2px dashed #e0f2f1;
+      padding-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .answers-container.active { display: block; }
+    
+    .answer-item {
+      background: var(--bubble-bg);
+      padding: 12px 15px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      font-size: 0.95em;
+      line-height: 1.6;
+      border-left: 4px solid var(--accent);
+    }
+    .answer-text { color: #006064; font-weight: 500; white-space: pre-line; }
+    .nickname { font-size: 0.8em; color: var(--gray); margin-left: 8px; }
+
+    /* 下方跳轉區塊 */
+    .nav-section {
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 40px;
+    }
+    .nav-text { font-size: 0.9em; color: #546e7a; margin-bottom: 15px; line-height: 1.5; }
+    .link-btn {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.95em;
+      padding: 8px 25px;
+      border: 1.5px solid var(--primary);
+      border-radius: 20px;
+      display: inline-block;
+      transition: 0.3s;
+    }
+    .link-btn:hover { background: var(--primary); color: white; }
+
+    /* 讀取中轉圈 */
+    .loading-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg); display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 100;
+    }
+    .spinner { 
+      width: 40px; height: 40px; border: 5px solid rgba(0, 139, 163, 0.1); 
+      border-left-color: var(--primary); border-radius: 50%; 
+      animation: spin 1s linear infinite; margin-bottom: 15px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer { text-align: center; margin-top: auto; padding-bottom: 20px; font-size: 0.85em; color: var(--gray); }
+  </style>
+</head>
+<body>
+
+  <!-- 讀取遮罩 -->
+  <div id="loader" class="loading-overlay">
+    <div class="spinner"></div>
+    <div>馬內正在搬運講義資料中...</div>
+  </div>
+
+  <div class="header-section">
+    <h1>馬內用考古題練習器</h1>
+    <div class="subtitle">
+      新手馬內救星！<br>
+      在場次前先預習可能會被民眾問什麼奇怪的問題！
+    </div>
+  </div>
+
+  <div class="card-container">
+    <div id="quiz-card" class="quiz-card">
+      <!-- 進行中介面 -->
+      <div id="quiz-active-area" style="width:100%">
+        <div id="q-difficulty" class="difficulty-tag"></div>
+        <div id="q-situation" class="situation-text"></div>
+        <div id="q-content" class="question-content"></div>
+        
+        <div class="btn-group">
+          <button class="main-btn" onclick="nextQuestion()">下一題 (隨機)</button>
+          <button id="toggle-ans-btn" class="accent-btn" onclick="toggleAnswers()">看看其他人的回答方法！</button>
+        </div>
+
+        <div id="answers-list" class="answers-container">
+          <!-- 回答動態生成 -->
+        </div>
+      </div>
+
+      <!-- 完成介面 -->
+      <div id="finish-screen">
+        <h3>🎉 恭喜！考古題全部翻完了！</h3>
+        <p>你已經預習了目前資料庫中所有的問題。<br>準備好去場次實戰了嗎？</p>
+        <button class="main-btn" onclick="resetQuiz()">重新開始練習</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-text">遇到了其他沒在上面的問題，或者想提供你的回答方法？</div>
+    <a href="javascript:void(0)" class="link-btn" onclick="goToSubmit()">📝 前往提交介面</a>
+  </div>
+
+  <div class="footer">
+    網頁製作：狛克
+  </div>
+
+<script>
+  // 重要：請替換成你部署後的 GAS Web App 網址
+  const API_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
+  
+  let allData = [];
+  let remainingPool = [];
+  let currentQuestion = null;
+
+  // 1. 初始化讀取
+  async function init() {
+    try {
+      const response = await fetch(`${API_URL}?action=getQA`);
+      allData = await response.json();
+      document.getElementById('loader').style.display = 'none';
+      resetQuiz();
+    } catch (error) {
+      console.error(error);
+      alert("讀取資料失敗。請檢查 API 網址，並確保後端已正確部署。");
+    }
+  }
+
+  // 2. 重置練習進度
+  function resetQuiz() {
+    remainingPool = [...allData];
+    // 打亂順序
+    remainingPool.sort(() => Math.random() - 0.5);
+    
+    document.getElementById('finish-screen').style.display = 'none';
+    document.getElementById('quiz-active-area').style.display = 'block';
+    nextQuestion();
+  }
+
+  // 3. 抽取下一題
+  function nextQuestion() {
+    if (remainingPool.length === 0) {
+      showFinishScreen();
+      return;
+    }
+
+    // 取得下一題
+    currentQuestion = remainingPool.pop();
+
+    // 更新介面
+    const qContent = document.getElementById('q-content');
+    const qDiff = document.getElementById('q-difficulty');
+    
+    document.getElementById('q-situation').innerText = currentQuestion.situation ? currentQuestion.situation : "";
+    qContent.innerText = `「${currentQuestion.content}」`;
+    
+    // 難度顯色邏輯
+    const diff = currentQuestion.difficulty || "基礎";
+    qDiff.innerText = "難度：" + diff;
+    qDiff.style.color = `var(--diff-${diff})`;
+    qContent.style.color = `var(--diff-${diff})`;
+    
+    // 隱藏回答區
+    const list = document.getElementById('answers-list');
+    list.classList.remove('active');
+    list.innerHTML = "";
+    document.getElementById('toggle-ans-btn').innerText = "看看其他人的回答方法！";
+    document.getElementById('toggle-ans-btn').style.display = currentQuestion.answers.length > 0 ? "flex" : "none";
+  }
+
+  // 4. 顯示完成畫面
+  function showFinishScreen() {
+    document.getElementById('quiz-active-area').style.display = 'none';
+    document.getElementById('finish-screen').style.display = 'block';
+  }
+
+  // 5. 切換回答顯示
+  function toggleAnswers() {
+    const list = document.getElementById('answers-list');
+    const btn = document.getElementById('toggle-ans-btn');
+    const isActive = list.classList.toggle('active');
+    
+    if (isActive) {
+      btn.innerText = "隱藏建議回答";
+      // 生成回答列表
+      list.innerHTML = currentQuestion.answers.map(ans => `
+        <div class="answer-item">
+          <span class="answer-text">「${ans.content}」</span>
+          <span class="nickname">${ans.nickname}</span>
+        </div>
+      `).join('');
+      
+      // 自動滾動到底部
+      setTimeout(() => {
+        list.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    } else {
+      btn.innerText = "看看其他人的回答方法！";
+    }
+  }
+
+  // 6. 跳轉到提交頁面
+  function goToSubmit() {
+    // 嘗試向後端請求原始連結，若是在 GitHub Pages 建議直接寫死 index 網址
+    google.script.run.withSuccessHandler(function(url) {
+      window.top.location.href = url;
+    }).getScriptUrl();
+  }
+
+  window.onload = init;
+</script>
+</body>
+</html>
