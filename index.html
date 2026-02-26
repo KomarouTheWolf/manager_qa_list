@@ -14,13 +14,12 @@
       --text: #2c3e50;
       --gray: #78909c;
       
-      /* 難度對應的圖卡背景色 (柔和系列) */
+      /* 難度對應顏色 */
       --diff-bg-基礎: #e0f7fa; 
       --diff-bg-低: #e3f2fd; 
       --diff-bg-中: #fff3e0; 
       --diff-bg-高: #ffebee;
 
-      /* 難度對應的文字深色 */
       --diff-text-基礎: #006064;
       --diff-text-低: #0d47a1;
       --diff-text-中: #e65100;
@@ -39,247 +38,207 @@
       min-height: 100vh;
     }
     
-    /* 標題區域強化：調整色塊長度 */
-    .header-section { text-align: center; margin-bottom: 25px; width: 100%; max-width: 500px; }
+    /* 標題區域強化 */
+    .header-section { text-align: center; margin-bottom: 35px; width: 100%; }
     h1 { 
       display: inline-block;
       background: var(--primary); 
       color: white; 
-      padding: 12px 60px; /* 增加左右內邊距使色塊更長 */
+      padding: 12px 80px; /* 加長色塊 */
       border-radius: 15px; 
       box-shadow: 0 4px 15px rgba(0, 139, 163, 0.2);
       margin-bottom: 15px; 
       letter-spacing: 3px; 
-      font-size: 1.6em; 
+      font-size: 1.8em; 
       white-space: nowrap;
     }
     .subtitle { 
       color: var(--primary); 
-      font-size: 0.9em; 
+      font-size: 0.95em; 
       font-weight: bold; 
       line-height: 1.6;
-      background: rgba(255, 255, 255, 0.5);
-      padding: 10px;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.6);
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: inline-block;
+      max-width: 600px;
     }
 
-    .progress-bar {
+    /* 網格容器 */
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
       width: 100%;
-      max-width: 500px;
-      height: 6px;
-      background: rgba(0, 139, 163, 0.1);
-      border-radius: 3px;
-      margin-bottom: 25px;
-      overflow: hidden;
-    }
-    #progress-fill {
-      height: 100%;
-      background: var(--primary);
-      width: 0%;
-      transition: width 0.3s;
+      max-width: 1200px;
+      margin-bottom: 40px;
     }
 
-    .card-container {
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .quiz-card {
+    /* 小卡片樣式 */
+    .mini-card {
       background: white;
-      border-radius: 25px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-      border-top: 8px solid var(--accent);
-      padding: 35px 25px;
-      box-sizing: border-box;
-      min-height: 400px;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-top: 5px solid var(--accent);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
       display: flex;
       flex-direction: column;
-      transition: background-color 0.4s ease, transform 0.3s ease;
+      height: 160px;
     }
-
-    .difficulty-tag {
+    .mini-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 20px rgba(0, 139, 163, 0.1);
+    }
+    .mini-card .diff-tag {
+      font-size: 0.75em;
+      font-weight: bold;
       text-align: right;
-      font-size: 0.85em;
-      font-weight: 800;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .mini-card .q-preview {
+      font-size: 1.05em;
+      font-weight: bold;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .chat-area { 
-      display: flex; 
-      align-items: flex-start; 
-      margin-bottom: 20px; 
-      flex-grow: 1;
+    /* 展開模式（Modal） */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(44, 62, 80, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      padding: 20px;
     }
-    .person-icon { font-size: 45px; margin-right: 15px; flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
-    
+    .expanded-card {
+      background: white;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 25px;
+      padding: 35px 25px;
+      border-top: 8px solid var(--accent);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      position: relative;
+      animation: expandIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes expandIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px; right: 20px;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: var(--gray);
+    }
+
+    /* 對話區域佈局 (展開後) */
+    .chat-area { display: flex; align-items: flex-start; margin-top: 15px; margin-bottom: 25px; }
+    .person-icon { font-size: 45px; margin-right: 15px; flex-shrink: 0; }
     .speech-bubble { 
-      position: relative; 
-      background: rgba(255, 255, 255, 0.7); 
-      border-radius: 20px; 
-      padding: 18px 22px; 
-      flex-grow: 1; 
-      border: 1px solid rgba(0, 0, 0, 0.03);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      position: relative; background: rgba(255, 255, 255, 0.9); border-radius: 20px; 
+      padding: 18px 22px; flex-grow: 1; border: 1px solid rgba(0, 0, 0, 0.05);
     }
     .speech-bubble::after { 
       content: ''; position: absolute; left: -10px; top: 20px; 
       border-width: 10px 10px 10px 0; border-style: solid; 
-      border-color: transparent rgba(255, 255, 255, 0.7) transparent transparent; 
+      border-color: transparent white transparent transparent; 
     }
+    .situation-inline { font-size: 0.9em; color: var(--gray); margin-bottom: 8px; font-weight: bold; }
+    .question-content { font-size: 1.25em; line-height: 1.6; font-weight: bold; }
 
-    .situation-inline { 
-      font-size: 0.9em; 
-      color: var(--gray); 
-      margin-bottom: 8px; 
-      line-height: 1.4; 
-      font-weight: bold;
-    }
-    .question-content { font-size: 1.25em; line-height: 1.6; font-weight: bold; color: inherit; }
-
-    .nav-controls {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-      margin-top: 20px;
-    }
-    button {
-      padding: 14px;
-      border: none;
-      border-radius: 15px;
-      font-size: 1em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .nav-btn { background: var(--primary); color: white; flex: 1; box-shadow: 0 4px 12px rgba(0, 139, 163, 0.15); }
-    .nav-btn:disabled { background: #cfd8dc; cursor: not-allowed; box-shadow: none; opacity: 0.6; }
-    .nav-btn:hover:not(:disabled) { background: var(--secondary); transform: translateY(-2px); }
-
-    .toggle-ans-btn {
-      width: 100%;
-      background: white;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-      margin-top: 20px;
-    }
-    .toggle-ans-btn:hover { background: var(--bg); }
-
+    /* 回答列表 */
     .answers-container {
-      display: none;
       margin-top: 20px;
       padding-top: 20px;
       border-top: 2px dashed rgba(0,0,0,0.05);
-      max-height: 250px;
+      max-height: 300px;
       overflow-y: auto;
     }
-    .answers-container.active { display: block; }
     .answer-item {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 12px 15px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      font-size: 0.95em;
-      border-left: 4px solid var(--accent);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      background: #f8fcfd; padding: 12px 15px; border-radius: 12px; margin-bottom: 12px;
+      border-left: 4px solid var(--accent); font-size: 0.95em;
     }
     .answer-text { white-space: pre-line; color: #37474f; font-weight: 500; }
     .nickname { font-size: 0.85em; color: var(--gray); margin-left: 8px; }
 
+    /* 下方跳轉按鈕 */
     .nav-section {
-      text-align: center;
-      width: 100%;
-      max-width: 500px;
-      margin-top: 25px;
-      padding: 20px;
-      font-size: 0.9em;
-      color: #546e7a;
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: 15px;
+      text-align: center; width: 100%; max-width: 500px;
+      margin-top: 25px; padding: 20px; font-size: 0.95em; color: #546e7a;
+      background: rgba(255, 255, 255, 0.5); border-radius: 15px;
     }
     .link-btn {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: bold;
-      margin-top: 10px;
-      display: inline-block;
-      padding: 8px 20px;
-      border: 1.5px solid var(--primary);
-      border-radius: 20px;
-      transition: 0.3s;
-      cursor: pointer;
+      color: var(--primary); text-decoration: none; font-weight: bold; margin-top: 15px;
+      display: inline-block; padding: 10px 25px; border: 2px solid var(--primary);
+      border-radius: 25px; transition: 0.3s; cursor: pointer;
     }
     .link-btn:hover { background: var(--primary); color: white; }
 
-    /* 修改 Loading 轉圈：使用 1.jpg 並旋轉 */
+    /* Loading 轉圈：使用 1.png */
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg); display: flex; flex-direction: column;
-      justify-content: center; align-items: center; z-index: 100;
+      justify-content: center; align-items: center; z-index: 300;
     }
     .spinner-img { 
-      width: 80px; /* 圖片大小調整 */
-      height: 80px; 
-      object-fit: cover;
-      border-radius: 50%;
-      animation: spin 2s linear infinite; 
-      margin-bottom: 20px;
+      width: 80px; height: 80px; object-fit: cover; border-radius: 50%;
+      animation: spin 2s linear infinite; margin-bottom: 20px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .footer { text-align: center; margin-top: auto; padding: 25px; font-size: 0.85em; color: var(--gray); }
+    .footer { text-align: center; margin-top: auto; padding: 30px; font-size: 0.85em; color: var(--gray); }
   </style>
 </head>
 <body>
 
   <!-- 讀取遮罩 -->
   <div id="loader" class="loading-overlay">
-    <!-- 使用 GitHub 資料夾中的 1.jpg -->
     <img src="1.png" alt="Loading" class="spinner-img" onerror="this.style.display='none'; document.getElementById('fallback-spinner').style.display='block';">
-    <!-- 備用轉圈 (如果圖片讀取失敗) -->
-    <div id="fallback-spinner" class="spinner" style="display:none; width:45px; height:45px; border:5px solid rgba(0, 139, 163, 0.1); border-left-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-    <div style="font-weight: bold; color: var(--primary)">布偶正在搬運圖卡...</div>
+    <div id="fallback-spinner" style="display:none; width:45px; height:45px; border:5px solid rgba(0, 139, 163, 0.1); border-left-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    <div style="font-weight: bold; color: var(--primary)">布偶正在整理考古題網格...</div>
+  </div>
+
+  <!-- 展開對話框 -->
+  <div id="modal" class="modal-overlay" onclick="closeCard(event)">
+    <div class="expanded-card" onclick="event.stopPropagation()">
+      <div class="close-btn" onclick="closeCard()">✕</div>
+      <div id="exp-diff" class="difficulty-tag" style="text-align:right; font-weight:800; font-size:0.85em; margin-bottom:15px;"></div>
+      
+      <div class="chat-area">
+        <div class="person-icon">👤</div>
+        <div class="speech-bubble">
+          <div id="exp-sit" class="situation-inline"></div>
+          <div id="exp-q" class="question-content"></div>
+        </div>
+      </div>
+      
+      <div id="exp-answers" class="answers-container"></div>
+    </div>
   </div>
 
   <div class="header-section">
     <h1>馬內生存模擬器</h1>
     <div class="subtitle">
-      新手馬內救星！<br>場次前先預習可能會被問什麼奇怪的問題！
+      新手馬內救星！<br>場次前先預習可能會被問什麼奇怪的問題！點擊題目展開看看大家的應對方法。
     </div>
   </div>
 
-  <div class="progress-bar">
-    <div id="progress-fill"></div>
-  </div>
-
-  <div class="card-container">
-    <div id="quiz-card" class="quiz-card">
-      <div id="q-difficulty" class="difficulty-tag">難度：載入中</div>
-      
-      <div class="chat-area">
-        <div class="person-icon">👤</div>
-        <div class="speech-bubble">
-          <div id="q-situation" class="situation-inline"></div>
-          <div id="q-content" class="question-content">讀取中...</div>
-        </div>
-      </div>
-      
-      <button id="toggle-ans-btn" class="toggle-ans-btn" onclick="toggleAnswers()">看看其他人的回答方法！</button>
-      
-      <div id="answers-list" class="answers-container"></div>
-      
-      <div class="nav-controls">
-        <button id="prev-btn" class="nav-btn" onclick="changeQuestion(-1)">← 上一題</button>
-        <button id="next-btn" class="nav-btn" onclick="changeQuestion(1)">下一題 →</button>
-      </div>
-    </div>
+  <div id="quiz-grid" class="quiz-grid">
+    <!-- 網格卡片動態生成 -->
   </div>
 
   <div class="nav-section">
@@ -296,92 +255,83 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbyE-vk-wEcTqD0LvuVTPmqrjVg2cHjOLxt_J31vaYtKQx02Bm6o4VM6rkuNcQDcg_DMJQ/exec";
   
   let allQuestions = [];
-  let currentIndex = 0;
 
   async function init() {
     try {
       const response = await fetch(`${API_URL}?action=getQA`);
       if (!response.ok) throw new Error('網路回應不正確');
-      const data = await response.json();
+      allQuestions = await response.json();
       
-      allQuestions = data.sort(() => Math.random() - 0.5);
+      // 隨機打亂順序增加新鮮感
+      allQuestions.sort(() => Math.random() - 0.5);
       
       document.getElementById('loader').style.display = 'none';
-      renderCard();
+      renderGrid();
     } catch (error) {
       console.error(error);
-      const loader = document.getElementById('loader');
-      loader.innerHTML = "<div style='color:red;padding:20px;text-align:center;'>載入資料失敗。<br>請確認 GAS 已「部署為 Web App」並將權限設為「任何人(Anyone)」。</div>";
+      document.getElementById('loader').innerHTML = "<div style='color:red;padding:20px;text-align:center;'>載入資料失敗。<br>請確認後端權限設定。</div>";
     }
   }
 
-  function renderCard() {
-    if (allQuestions.length === 0) return;
+  function renderGrid() {
+    const grid = document.getElementById('quiz-grid');
+    grid.innerHTML = '';
 
-    const q = allQuestions[currentIndex];
-    const card = document.getElementById('quiz-card');
-    const qContent = document.getElementById('q-content');
-    const qDiff = document.getElementById('q-difficulty');
-    const sitText = document.getElementById('q-situation');
-    const list = document.getElementById('answers-list');
-    const toggleBtn = document.getElementById('toggle-ans-btn');
+    allQuestions.forEach((q, index) => {
+      const diff = q.difficulty || "基礎";
+      const card = document.createElement('div');
+      card.className = 'mini-card';
+      card.style.backgroundColor = `var(--diff-bg-${diff})`;
+      card.onclick = () => openCard(index);
 
-    sitText.innerText = q.situation ? q.situation : "";
-    sitText.style.display = q.situation ? "block" : "none";
-    qContent.innerText = `「${q.content}」`;
-    
+      card.innerHTML = `
+        <div class="diff-tag" style="color:var(--diff-text-${diff})">難度：${diff}</div>
+        <div class="q-preview" style="color:var(--diff-text-${diff})">「${q.content}」</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function openCard(index) {
+    const q = allQuestions[index];
     const diff = q.difficulty || "基礎";
-    qDiff.innerText = "難度：" + diff;
-    card.style.backgroundColor = `var(--diff-bg-${diff})`;
-    card.style.color = `var(--diff-text-${diff})`;
+    const modal = document.getElementById('modal');
+    const expCard = document.querySelector('.expanded-card');
+
+    document.getElementById('exp-diff').innerText = "難度：" + diff;
+    document.getElementById('exp-diff').style.color = `var(--diff-text-${diff})`;
     
-    list.classList.remove('active');
-    list.innerHTML = "";
-    toggleBtn.innerText = "看看其他人的回答方法！";
-    toggleBtn.style.display = q.answers.length > 0 ? "block" : "none";
-
-    document.getElementById('prev-btn').disabled = (currentIndex === 0);
-    document.getElementById('next-btn').innerText = (currentIndex === allQuestions.length - 1) ? "全部完成！" : "下一題 →";
-
-    const progress = ((currentIndex + 1) / allQuestions.length) * 100;
-    document.getElementById('progress-fill').style.width = progress + "%";
-  }
-
-  function changeQuestion(step) {
-    const newIndex = currentIndex + step;
-    if (newIndex >= 0 && newIndex < allQuestions.length) {
-      currentIndex = newIndex;
-      renderCard();
-    } else if (newIndex >= allQuestions.length) {
-      if(confirm("恭喜你練習完所有考古題了！要再練習一次嗎？")) {
-        location.reload();
-      }
-    }
-  }
-
-  function toggleAnswers() {
-    const list = document.getElementById('answers-list');
-    const btn = document.getElementById('toggle-ans-btn');
-    const isActive = list.classList.toggle('active');
+    document.getElementById('exp-sit').innerText = q.situation ? q.situation : "";
+    document.getElementById('exp-sit').style.display = q.situation ? "block" : "none";
     
-    if (isActive) {
-      btn.innerText = "隱藏建議回答";
-      const q = allQuestions[currentIndex];
-      list.innerHTML = q.answers.map(ans => `
+    document.getElementById('exp-q').innerText = `「${q.content}」`;
+    document.getElementById('exp-q').style.color = `var(--diff-text-${diff})`;
+    
+    expCard.style.backgroundColor = `var(--diff-bg-${diff})`;
+
+    // 渲染回答
+    const ansContainer = document.getElementById('exp-answers');
+    if (q.answers && q.answers.length > 0) {
+      ansContainer.innerHTML = q.answers.map(ans => `
         <div class="answer-item">
           <span class="answer-text">「${ans.content}」</span>
           <span class="nickname">${ans.nickname}</span>
         </div>
       `).join('');
+      ansContainer.style.display = 'block';
     } else {
-      btn.innerText = "看看其他人的回答方法！";
+      ansContainer.innerHTML = '<div style="text-align:center;color:#999;font-size:0.9em;padding:10px;">尚未有精選回答</div>';
+      ansContainer.style.display = 'block';
     }
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // 防止背景滾動
   }
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') changeQuestion(-1);
-    if (e.key === 'ArrowRight') changeQuestion(1);
-  });
+  function closeCard() {
+    document.getElementById('modal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
 
   function goToSubmit() {
     const targetUrl = "https://script.google.com/macros/s/AKfycbzM73d764og_Ke8BTTZQkRWgam-o1oub1vw26TahVzHBtopsiUvfOR3QyXliftKSEvvuw/exec";
